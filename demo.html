@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+	</head>
+	<body>
+		<p> <h1>window._promise</h1>
+			_promise(function(resolve 成功, reject 错误){})<br/>
+			.then(function(返回值){}) 成功后执行<br/>
+			.wait(等待秒数) 等待<br/>
+			.fail(function(错误值){}) 错误后执行<br/>
+			.always(function(){}) 无论成功或错误都要执行<br/>
+			<br/>
+			_promise.when(function(resolve, reject){}, string, ...) 参数无限制<br/>
+			.done(function(返回值){}) 成功后执行<br/>
+			.fail(function(错误值){}) 错误后执行<br/>
+			<h2>例如: 多请求用同一处理方式</h2>
+			_promise.when(function(resolve, reject){<br/>
+				ajax(url, function(data){<br/>
+					resolve(data);<br/>
+				}).error(function(){<br/>
+					reject("error")<br/>
+				});<br/>
+			},function(resolve, reject){<br/>
+				ajax(url, function(data){<br/>
+					resolve(data);<br/>
+				}).error(function(){<br/>
+					reject("error")<br/>
+				});<br/>
+			},"return String;").done(function(data){<br/>
+				console.log(data);<br/>
+			}).fail(function(msg){<br/>
+				console.log(msg)<br/>
+			})<br/>
+			<h2>例如: 顺序执行</h2>
+			_promise().then(function(){<br/>
+				console.log("exec 1");<br/>
+			}).then(function(){<br/>
+				console.log("exec 2");<br/>
+			}).then(function(){<br/>
+				console.log("exec 3");<br/>
+			}).then(function(){<br/>
+				console.log("exec 4");<br/>
+			});<br/>
+			<h2>例如: 顺序执行</h2>
+			var a = _promise();<br/>
+			for (i = 0; i < 4; i++) {<br/>
+				a.then(function() {<br/>
+					console.log("exec " + (i + 1));<br/>
+				});<br/>
+			}<br/>
+		</p>
+		<script src="promise.js"></script>
+		<script src="../jsonp/jsonp.0.0.1.js"></script>
+		<script>
+			/*  promise
+				promise(function(resolve 成功, reject 错误){})
+					.then(function(返回值){}) 成功后执行
+					.wait(等待秒数) 等待
+					.fail(function(错误值){}) 错误后执行
+					.always(function(){}) 无论成功或错误都要执行
+				promise.when(function(resolve, reject){}, string, ...) 参数无限制
+					.done(function(返回值){}) 成功后执行
+					.fail(function(错误值){}) 错误后执行
+			*/
+			var n =0;
+			_promise(function(resolve, reject) {
+				jsonp("http://aa.aa.com/api/getHotPic").done(function(result){
+					resolve(result);
+				}, function(error){
+					reject(error);
+				});
+			}).then(function(args) {
+				console.log(args,n++)
+			}).wait(2).then(function(args) {
+				"2".toFixed(1)
+				console.log(args,n++)
+			}).then(function(args) {
+				console.log(args,n++, "promise"+n)
+			}).then(function(args) {
+				console.log(args,n++)
+			}).then(function(args) {
+				console.log(args,n++)
+			}).fail(function(error) {
+				console.log(error)
+			}).always(function() {
+				console.log(this)
+			});
+
+			var a=0;
+			_promise.when(function(resolve, reject){
+				try {
+					resolve("function"+(a++));
+				} catch (e) {
+					reject(e.message);
+				}
+			}, function(resolve, reject){
+				try {
+					resolve("3".toFixed(1));
+				} catch (e) {
+					reject(e.message);
+				}
+			}, "function"+(a++)).done(function(args){
+				console.log(args)
+			}).fail(function(error) {
+				console.log(error)
+			});
+
+			j=1;
+			_promise.when(function(resolve, reject){
+				jsonp("http://aa.aa.com/api/getHotPic").done(function(result){
+					resolve(result, "getHotPic");
+				}, function(error){
+					reject(error);
+				});
+			}, function(resolve, reject){
+				jsonp("http://aa.aa.com/GetComment.do").done(function(result){
+					resolve(result, "GetComment");
+				}, function(error){
+					reject(error);
+				});
+			}, function(resolve, reject){
+				jsonp("http://aa.aa.com/forapp/getrelativenewsJson.jsp", false, {
+					callback: "cb"
+				}).done(function(result){
+					resolve(result, "getrelativenewsJson");
+				}, function(error){
+					reject(error);
+				});
+			}, function(resolve, reject){
+				jsonp("http://aa.aa.com/outxml/M/HotFundIndex.ashx",false, {
+					callback: "cb"
+				}).done(function(result){
+					resolve(result, "HotFundIndex");
+				}, function(error){
+					reject(error);
+				});
+			}, function(resolve, reject){
+				jsonp("http://aa.aa.com/api/getHotArt").done(function(result){
+					resolve(result, "getHotArt");
+				}, function(error){
+					reject(error);
+				});
+			}).done(function(args, type){
+				console.log(args, type, "jsonp"+(j++))
+			}).fail(function(error) {
+				console.log(error)
+			});
+
+			_promise().then(function(){
+				console.log("exec 1");
+			}).then(function(){
+				console.log("4".toFixed(1));
+			}).then(function(){
+				console.log("exec 3");
+			}).then(function(){
+				console.log("exec 4");
+			});
+
+			var a = _promise();
+			for (i = 0; i < 4; i++) {
+				a.then(function() {
+					console.log("exec " + (i + 1));
+				});
+			}
+		</script>
+	</body>
+</html>
